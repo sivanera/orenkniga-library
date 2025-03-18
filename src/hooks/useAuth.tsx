@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { User, UserRole } from '@/lib/types';
 
 interface AuthContextType {
@@ -40,6 +40,7 @@ const mockUsers = [
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Initialize mock users if not already present
@@ -71,9 +72,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(user);
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-      toast.success('Успешный вход в систему!');
+      toast({
+        title: "Успешный вход в систему!",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error((error as Error).message || 'Ошибка входа');
+      toast({
+        title: (error as Error).message || 'Ошибка входа',
+        variant: "destructive",
+      });
       throw error;
     } finally {
       setIsLoading(false);
@@ -104,9 +111,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(newUser);
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
-      toast.success('Регистрация успешна!');
+      toast({
+        title: "Регистрация успешна!",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error((error as Error).message || 'Ошибка регистрации');
+      toast({
+        title: (error as Error).message || 'Ошибка регистрации',
+        variant: "destructive",
+      });
       throw error;
     } finally {
       setIsLoading(false);
@@ -116,7 +129,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem(CURRENT_USER_KEY);
-    toast.success('Вы вышли из системы');
+    toast({
+      title: "Вы вышли из системы",
+      variant: "default",
+    });
   };
 
   const updateProfile = async (updatedInfo: Partial<User>) => {
@@ -134,9 +150,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
       
       setUser(updatedUser);
-      toast.success('Профиль обновлен');
+      toast({
+        title: "Профиль обновлен",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error('Не удалось обновить профиль');
+      toast({
+        title: "Не удалось обновить профиль",
+        variant: "destructive",
+      });
     }
   };
 
