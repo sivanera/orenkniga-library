@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Author from "./pages/Author";
 import AuthorUpload from "./pages/AuthorUpload";
 import AuthorEdit from "./pages/AuthorEdit";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/author" element={<Author />} />
             <Route path="/author/upload" element={<AuthorUpload />} />
             <Route path="/author/edit/:id" element={<AuthorEdit />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
