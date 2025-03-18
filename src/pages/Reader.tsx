@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Book, ReaderSettings } from '@/lib/types';
@@ -28,9 +27,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 
-// Mock data
 const mockBooks: Book[] = [
   {
     id: '1',
@@ -80,7 +78,6 @@ const Reader: React.FC = () => {
   const [controlTimeout, setControlTimeout] = useState<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    // In a real app, this would be an API call
     const fetchedBook = mockBooks.find((b) => b.id === id);
     
     setTimeout(() => {
@@ -88,7 +85,6 @@ const Reader: React.FC = () => {
       setLoading(false);
     }, 500);
     
-    // Load user settings
     const savedSettings = localStorage.getItem('orenkniga-reader-settings');
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
@@ -104,7 +100,6 @@ const Reader: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('orenkniga-reader-settings', JSON.stringify(settings));
     
-    // Apply theme to body
     if (settings.theme === 'dark') {
       document.body.classList.add('dark');
     } else {
@@ -174,7 +169,6 @@ const Reader: React.FC = () => {
       )}
       onClick={handleScreenTap}
     >
-      {/* Top controls */}
       <div 
         className={cn(
           "fixed top-0 left-0 right-0 flex justify-between items-center px-4 py-3",
@@ -334,7 +328,6 @@ const Reader: React.FC = () => {
         </div>
       </div>
       
-      {/* Content */}
       <div 
         className="py-16 transition-all duration-300 ease-in-out"
         style={{
@@ -356,7 +349,6 @@ const Reader: React.FC = () => {
         ))}
       </div>
       
-      {/* Bottom controls */}
       <div 
         className={cn(
           "fixed bottom-0 left-0 right-0 flex justify-between items-center px-4 py-3",

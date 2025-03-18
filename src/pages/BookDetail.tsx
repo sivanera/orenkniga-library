@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -9,9 +8,8 @@ import { ChevronLeft, Bookmark, Heart, Share2, Star, User, Clock, Download } fro
 import { cn } from '@/lib/utils';
 import UserAvatar from '@/components/UserAvatar';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 
-// Mock data
 const mockBooks: Book[] = [
   {
     id: '1',
@@ -72,7 +70,7 @@ const mockReviews: Review[] = [
     userId: '11',
     userName: 'Елена',
     rating: 4,
-    text: 'Очень понравилось, но некоторые моменты показались затянутыми. Тем не менее, это классика, которую должен прочитать каждый!',
+    text: 'Очень понравилось, но некоторые моменты показались затянутыми. Тем не менее, это классика, которую должен прочитать кажды��!',
     date: '2023-03-22'
   },
   {
@@ -96,7 +94,6 @@ const BookDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   
   useEffect(() => {
-    // In a real app, this would be an API call
     const fetchedBook = mockBooks.find((b) => b.id === id);
     const fetchedReviews = mockReviews.filter((r) => r.bookId === id);
     
@@ -106,7 +103,6 @@ const BookDetail: React.FC = () => {
       setLoading(false);
     }, 500);
     
-    // Check if book is in favorites
     const favorites = JSON.parse(localStorage.getItem('orenkniga-favorites') || '[]');
     setIsFavorite(favorites.includes(id));
   }, [id]);

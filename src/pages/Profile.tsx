@@ -18,14 +18,15 @@ import {
   History,
   Globe,
   Moon,
-  PenTool
+  PenTool,
+  ChevronRight
 } from 'lucide-react';
 import BookCard from '@/components/BookCard';
 import { Book } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 // Mock data

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Book } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
