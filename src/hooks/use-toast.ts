@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -167,6 +168,29 @@ function toast({ ...props }: Toast) {
     update,
   }
 }
+
+// Helper functions for various toast types
+toast.success = (message: string) => {
+  return toast({
+    title: message,
+    variant: "default",
+  });
+};
+
+toast.error = (message: string) => {
+  return toast({
+    title: message,
+    variant: "destructive",
+  });
+};
+
+toast.info = (message: string) => {
+  return toast({
+    title: message,
+    variant: "default",
+    description: "Информация",
+  });
+};
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)

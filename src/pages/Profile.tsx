@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-// Mock data
 const mockBooks: Book[] = [
   {
     id: '1',
@@ -91,18 +89,15 @@ const Profile: React.FC = () => {
       return;
     }
     
-    // Set initial form values
     setProfileForm({
       name: user.name,
       bio: user.bio || ''
     });
     
-    // In a real app, these would be API calls
     const favorites = JSON.parse(localStorage.getItem('orenkniga-favorites') || '[]');
     const favoriteBooksList = mockBooks.filter(book => favorites.includes(book.id));
     setFavoriteBooks(favoriteBooksList);
     
-    // Just using mockBooks for history as well for demo
     setHistoryBooks(mockBooks.slice(0, 3));
   }, [user, navigate]);
   
@@ -134,7 +129,7 @@ const Profile: React.FC = () => {
   };
   
   if (!user) {
-    return null; // Will redirect in useEffect
+    return null;
   }
 
   return (
