@@ -13,7 +13,8 @@ import {
   Upload,
   Star,
   Eye,
-  Pencil
+  Pencil,
+  BarChart
 } from 'lucide-react';
 import { Book } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -25,50 +26,49 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
-// Mock data
-const mockAuthorBooks: Book[] = [
-  {
-    id: '5',
-    title: 'Мой первый роман',
-    author: { id: '1', name: 'Иван Автор' },
-    description: 'Дебютный роман о приключениях молодого человека в большом городе.',
-    genres: ['Приключения', 'Современная проза'],
-    rating: 4.2,
-    reviewCount: 32,
-    publishedDate: '2023-05-15'
-  },
-  {
-    id: '6',
-    title: 'Летние истории',
-    author: { id: '1', name: 'Иван Автор' },
-    description: 'Сборник коротких рассказов о лете и отдыхе.',
-    genres: ['Рассказы', 'Лирика'],
-    rating: 4.5,
-    reviewCount: 18,
-    publishedDate: '2023-07-20'
+// Получаем книги из localStorage или используем моковые данные
+const getAuthorBooks = (userId: string): Book[] => {
+  const storedBooks = localStorage.getItem('orenkniga-author-books');
+  const authorBooks = storedBooks ? JSON.parse(storedBooks) : [];
+  
+  // Фильтруем книги по ID автора, если хранилище не пусто
+  if (authorBooks.length > 0) {
+    return authorBooks.filter((book: Book) => book.author.id === userId);
   }
-];
+  
+  // Иначе возвращаем моковые данные
+  return [
+    {
+      id: '5',
+      title: 'Мой первый роман',
+      author: { id: userId, name: 'Автор' },
+      description: 'Дебютный роман о приключениях молодого человека в большом городе.',
+      genres: ['Приключения', 'Современная проза'],
+      rating: 4.2,
+      reviewCount: 32,
+      publishedDate: '2023-05-15'
+    },
+    {
+      id: '6',
+      title: 'Летние истории',
+      author: { id: userId, name: 'Автор' },
+      description: 'Сборник коротких рассказов о лете и отдыхе.',
+      genres: ['Рассказы', 'Лирика'],
+      rating: 4.5,
+      reviewCount: 18,
+      publishedDate: '2023-07-20'
+    }
+  ];
+};
 
 const Author: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [uploadForm, setUploadForm] = useState({
-    title: '',
-    description: '',
-    genre: '',
-    content: ''
-  });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   useEffect(() => {
     if (!user) {
@@ -82,67 +82,19 @@ const Author: React.FC = () => {
       return;
     }
     
-    // In a real app, this would be an API call to get user's books
-    setBooks(mockAuthorBooks);
+    // Получаем книги автора
+    setBooks(getAuthorBooks(user.id));
   }, [user, navigate]);
-  
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUploadForm(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.type !== 'text/plain') {
-        toast.error('Пожалуйста, загрузите файл в формате .txt');
-        return;
-      }
-      setSelectedFile(file);
-    }
-  };
-  
-  const handleBookUpload = () => {
-    if (!selectedFile) {
-      toast.error('Пожалуйста, загрузите файл');
-      return;
-    }
-    
-    if (!uploadForm.title || !uploadForm.description) {
-      toast.error('Заполните все обязательные поля');
-      return;
-    }
-    
-    // In a real app, this would be an API call to upload book
-    
-    const newBook: Book = {
-      id: Date.now().toString(),
-      title: uploadForm.title,
-      author: { id: user!.id, name: user!.name },
-      description: uploadForm.description,
-      genres: uploadForm.genre.split(',').map(g => g.trim()),
-      rating: 0,
-      reviewCount: 0,
-      publishedDate: new Date().toISOString().split('T')[0]
-    };
-    
-    setBooks(prev => [newBook, ...prev]);
-    setUploadForm({
-      title: '',
-      description: '',
-      genre: '',
-      content: ''
-    });
-    setSelectedFile(null);
-    setIsUploadDialogOpen(false);
-    
-    toast.success('Произведение успешно загружено');
-  };
   
   const handleDeleteBook = () => {
     if (!selectedBook) return;
     
-    // In a real app, this would be an API call to delete book
+    // В реальном приложении здесь был бы API-запрос
+    // Удаляем из localStorage для демонстрации
+    const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
+    const updatedBooks = authorBooks.filter((book: Book) => book.id !== selectedBook.id);
+    localStorage.setItem('orenkniga-author-books', JSON.stringify(updatedBooks));
+    
     setBooks(prev => prev.filter(book => book.id !== selectedBook.id));
     setIsDeleteDialogOpen(false);
     toast.success('Произведение удалено');
@@ -175,78 +127,13 @@ const Author: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">Мои произведения</h2>
-            <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-1">
-                  <Upload className="h-4 w-4" />
-                  <span>Загрузить</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Загрузить новое произведение</DialogTitle>
-                  <DialogDescription>
-                    Заполните информацию и загрузите файл в формате .txt
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Название</Label>
-                    <Input
-                      id="title"
-                      name="title"
-                      value={uploadForm.title}
-                      onChange={handleFormChange}
-                      placeholder="Введите название произведения"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Описание</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      rows={3}
-                      value={uploadForm.description}
-                      onChange={handleFormChange}
-                      placeholder="Краткое описание произведения"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="genre">Жанры</Label>
-                    <Input
-                      id="genre"
-                      name="genre"
-                      value={uploadForm.genre}
-                      onChange={handleFormChange}
-                      placeholder="Жанры через запятую (напр.: Фантастика, Роман)"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="file">Файл произведения (.txt)</Label>
-                    <Input
-                      id="file"
-                      type="file"
-                      accept=".txt"
-                      onChange={handleFileChange}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Максимальный размер файла: 10MB
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
-                    Отмена
-                  </Button>
-                  <Button onClick={handleBookUpload}>
-                    Загрузить
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              className="flex items-center gap-1"
+              onClick={() => navigate('/author/upload')}
+            >
+              <Upload className="h-4 w-4" />
+              <span>Загрузить</span>
+            </Button>
           </div>
           
           <Tabs defaultValue="books" className="w-full">
@@ -256,7 +143,7 @@ const Author: React.FC = () => {
                 Произведения
               </TabsTrigger>
               <TabsTrigger value="stats">
-                <Star className="h-4 w-4 mr-1" />
+                <BarChart className="h-4 w-4 mr-1" />
                 Статистика
               </TabsTrigger>
             </TabsList>
@@ -265,7 +152,7 @@ const Author: React.FC = () => {
               {books.length > 0 ? (
                 <div className="space-y-3">
                   {books.map((book) => (
-                    <div key={book.id} className="border rounded-lg overflow-hidden">
+                    <div key={book.id} className="border rounded-lg overflow-hidden bg-card hover:shadow-sm transition-shadow">
                       <div className="p-4">
                         <div className="flex justify-between items-start">
                           <div>
@@ -307,9 +194,9 @@ const Author: React.FC = () => {
                         <Button 
                           variant="ghost" 
                           className="py-2 rounded-none flex items-center justify-center gap-1"
-                          onClick={() => toast.info("Редактирование произведений будет доступно в следующей версии")}
+                          onClick={() => navigate(`/author/edit/${book.id}`)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                           <span className="text-sm">Редактировать</span>
                         </Button>
                         <Button 
@@ -325,12 +212,12 @@ const Author: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-8 text-muted-foreground bg-muted/10 rounded-lg">
                   <Pencil className="h-10 w-10 mx-auto mb-2 text-muted" />
                   <p>У вас пока нет загруженных произведений</p>
                   <Button 
                     variant="link" 
-                    onClick={() => setIsUploadDialogOpen(true)}
+                    onClick={() => navigate('/author/upload')}
                     className="mt-2"
                   >
                     Загрузить первое произведение
@@ -340,11 +227,33 @@ const Author: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="stats">
-              <div className="text-center py-8 bg-muted/20 rounded-lg">
-                <h3 className="font-medium">Статистика будет доступна в следующей версии</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Здесь вы сможете просматривать статистику чтения, отзывы и рейтинги
-                </p>
+              <div className="space-y-4">
+                <div className="text-center py-8 bg-muted/10 rounded-lg">
+                  <h3 className="font-medium">Статистика чтения</h3>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {books.map(book => (
+                      <div key={book.id} className="border rounded-md p-3 bg-card">
+                        <h4 className="font-medium text-sm truncate">{book.title}</h4>
+                        <div className="flex justify-between mt-2 text-sm">
+                          <span>Просмотры:</span>
+                          <span className="font-medium">{Math.floor(Math.random() * 100) + 10}</span>
+                        </div>
+                        <div className="flex justify-between mt-1 text-sm">
+                          <span>Рейтинг:</span>
+                          <span className="font-medium text-amber-500">
+                            {book.rating.toFixed(1)} <span className="text-xs">({book.reviewCount})</span>
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {books.length === 0 && (
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Загрузите произведения, чтобы видеть их статистику
+                    </p>
+                  )}
+                </div>
               </div>
             </TabsContent>
           </Tabs>

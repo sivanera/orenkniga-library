@@ -12,6 +12,8 @@ import BookDetail from "./pages/BookDetail";
 import Reader from "./pages/Reader";
 import Profile from "./pages/Profile";
 import Author from "./pages/Author";
+import AuthorUpload from "./pages/AuthorUpload";
+import AuthorEdit from "./pages/AuthorEdit";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
             <Route path="/reader/:id" element={<Reader />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/author" element={<Author />} />
+            <Route path="/author/upload" element={<AuthorUpload />} />
+            <Route path="/author/edit/:id" element={<AuthorEdit />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
