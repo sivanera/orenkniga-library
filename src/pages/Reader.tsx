@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Book, ReaderSettings } from '@/lib/types';
@@ -78,7 +79,14 @@ const Reader: React.FC = () => {
   const [controlTimeout, setControlTimeout] = useState<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    const fetchedBook = mockBooks.find((b) => b.id === id);
+    // Сначала ищем в моковых данных
+    let fetchedBook = mockBooks.find((b) => b.id === id);
+    
+    // Если не нашли, ищем в загруженных авторами книгах
+    if (!fetchedBook) {
+      const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
+      fetchedBook = authorBooks.find((b: Book) => b.id === id);
+    }
     
     setTimeout(() => {
       setBook(fetchedBook || null);

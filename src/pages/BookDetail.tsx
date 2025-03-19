@@ -94,7 +94,13 @@ const BookDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   
   useEffect(() => {
-    const fetchedBook = mockBooks.find((b) => b.id === id);
+    let fetchedBook = mockBooks.find((b) => b.id === id);
+    
+    if (!fetchedBook) {
+      const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
+      fetchedBook = authorBooks.find((b: Book) => b.id === id);
+    }
+    
     const fetchedReviews = mockReviews.filter((r) => r.bookId === id);
     
     setTimeout(() => {
