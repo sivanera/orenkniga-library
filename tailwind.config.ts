@@ -106,24 +106,40 @@ export default {
 					'0%': { 
 						opacity: '1',
 						transform: 'perspective(1200px) rotateY(0)',
-						transformOrigin: 'left'
+						transformOrigin: 'left',
+						boxShadow: '0 5px 10px rgba(0, 0, 0, 0)'
+					},
+					'50%': {
+						opacity: '1',
+						transform: 'perspective(1200px) rotateY(-15deg)',
+						transformOrigin: 'left',
+						boxShadow: '10px 5px 15px rgba(0, 0, 0, 0.1)'
 					},
 					'100%': { 
 						opacity: '1',
-						transform: 'perspective(1200px) rotateY(-20deg)',
-						transformOrigin: 'left'
+						transform: 'perspective(1200px) rotateY(0)',
+						transformOrigin: 'left',
+						boxShadow: '0 5px 10px rgba(0, 0, 0, 0)'
 					}
 				},
 				'page-flip-left': {
 					'0%': { 
 						opacity: '1',
 						transform: 'perspective(1200px) rotateY(0)',
-						transformOrigin: 'right'
+						transformOrigin: 'right',
+						boxShadow: '0 5px 10px rgba(0, 0, 0, 0)'
+					},
+					'50%': {
+						opacity: '1',
+						transform: 'perspective(1200px) rotateY(15deg)',
+						transformOrigin: 'right',
+						boxShadow: '-10px 5px 15px rgba(0, 0, 0, 0.1)'
 					},
 					'100%': { 
 						opacity: '1',
-						transform: 'perspective(1200px) rotateY(20deg)',
-						transformOrigin: 'right'
+						transform: 'perspective(1200px) rotateY(0)',
+						transformOrigin: 'right',
+						boxShadow: '0 5px 10px rgba(0, 0, 0, 0)'
 					}
 				}
 			},
@@ -136,8 +152,8 @@ export default {
 				'slide-down': 'slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
 				'slide-in-right': 'slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
 				'slide-in-left': 'slide-in-left 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-				'page-flip-right': 'page-flip-right 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards',
-				'page-flip-left': 'page-flip-left 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards'
+				'page-flip-right': 'page-flip-right 0.8s cubic-bezier(0.3, 0.1, 0.3, 1.0) forwards',
+				'page-flip-left': 'page-flip-left 0.8s cubic-bezier(0.3, 0.1, 0.3, 1.0) forwards'
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],

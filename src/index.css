@@ -136,11 +136,20 @@
     opacity: 1;
     transform: perspective(1200px) rotateY(0);
     transform-origin: left;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(-15deg);
+    transform-origin: left;
+    box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.1);
+    filter: brightness(0.98);
   }
   100% {
     opacity: 1;
-    transform: perspective(1200px) rotateY(-20deg);
+    transform: perspective(1200px) rotateY(0);
     transform-origin: left;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
   }
 }
 
@@ -149,22 +158,62 @@
     opacity: 1;
     transform: perspective(1200px) rotateY(0);
     transform-origin: right;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(15deg);
+    transform-origin: right;
+    box-shadow: -10px 5px 15px rgba(0, 0, 0, 0.1);
+    filter: brightness(0.98);
   }
   100% {
     opacity: 1;
-    transform: perspective(1200px) rotateY(20deg);
+    transform: perspective(1200px) rotateY(0);
     transform-origin: right;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
   }
 }
 
 .animate-page-flip-right {
-  animation: page-flip-right 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+  animation: page-flip-right 0.8s cubic-bezier(0.3, 0.1, 0.3, 1.0) forwards;
+  position: relative;
   animation-delay: 0ms;
 }
 
 .animate-page-flip-left {
-  animation: page-flip-left 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+  animation: page-flip-left 0.8s cubic-bezier(0.3, 0.1, 0.3, 1.0) forwards;
+  position: relative;
   animation-delay: 0ms;
+}
+
+.animate-page-flip-right:after,
+.animate-page-flip-left:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 20%);
+  opacity: 0;
+  animation: shadow-fade 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+.animate-page-flip-right:after {
+  left: 0;
+  transform-origin: left;
+}
+
+.animate-page-flip-left:after {
+  right: 0;
+  transform-origin: right;
+}
+
+@keyframes shadow-fade {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Reader specific styles */
@@ -182,3 +231,37 @@
   -ms-user-select: none !important;
 }
 
+.page-container {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-color, white);
+  transition: background-color 0.3s ease;
+}
+
+.page-content {
+  position: relative;
+  z-index: 2;
+}
+
+.dark .page-container {
+  --bg-color: hsl(222.2 84% 4.9%);
+}
+
+.page-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(0,0,0,0.03), transparent);
+}
+
+.page-edge-left {
+  left: 0;
+  transform-origin: left;
+}
+
+.page-edge-right {
+  right: 0;
+  transform-origin: right;
+}

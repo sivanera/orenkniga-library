@@ -56,7 +56,7 @@ const mockBooks: Book[] = [
     rating: 4.7,
     reviewCount: 983,
     publishedDate: '1866-01-01',
-    content: 'Содержание "Прест��пления и наказания"...'
+    content: 'Содержание "Прест����пления и наказания"...'
   },
 ];
 
@@ -174,15 +174,15 @@ const Reader: React.FC = () => {
     }
     
     if (direction === 'right' && currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      setTimeout(() => setCurrentPage(prev => prev + 1), 400);
     } else if (direction === 'left' && currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      setTimeout(() => setCurrentPage(prev => prev - 1), 400);
     }
     
     setTimeout(() => {
       setIsFlipping(false);
       setFlipDirection(null);
-    }, 500);
+    }, 800);
   };
   
   const getContentForPage = (pageNum: number) => {
@@ -391,33 +391,57 @@ const Reader: React.FC = () => {
       </div>
       
       <div 
-        ref={contentRef}
         className={cn(
-          "py-16 transition-all duration-300 ease-in-out select-none",
+          "py-16 page-container",
           isFlipping && flipDirection === 'right' && "animate-page-flip-right",
           isFlipping && flipDirection === 'left' && "animate-page-flip-left"
         )}
+        ref={contentRef}
         style={{
           padding: `64px ${settings.margins}px`,
-          fontSize: `${settings.fontSize}px`,
-          lineHeight: settings.lineHeight,
-          fontFamily: settings.fontFamily === 'serif' ? 'serif' : 'Inter, sans-serif',
           maxWidth: '800px',
           margin: '0 auto',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none'
+          minHeight: 'calc(100vh - 128px)',
+          position: 'relative',
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.05)',
+          borderRadius: '2px',
         }}
       >
-        <h1 className="text-xl font-bold mb-4">{book.title}</h1>
-        <h2 className="text-lg mb-6">{book.author.name}</h2>
+        <div 
+          className="page-edge page-edge-left"
+          style={{
+            boxShadow: flipDirection === 'right' ? '2px 0 5px rgba(0,0,0,0.1)' : 'none',
+          }}
+        />
         
-        {getContentForPage(currentPage).map((paragraph, index) => (
-          <p key={index} className="mb-4 text-balance">
-            {paragraph}
-          </p>
-        ))}
+        <div 
+          className="page-edge page-edge-right"
+          style={{
+            boxShadow: flipDirection === 'left' ? '-2px 0 5px rgba(0,0,0,0.1)' : 'none',
+          }}
+        />
+        
+        <div 
+          className="page-content"
+          style={{
+            fontSize: `${settings.fontSize}px`,
+            lineHeight: settings.lineHeight,
+            fontFamily: settings.fontFamily === 'serif' ? 'serif' : 'Inter, sans-serif',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
+          }}
+        >
+          <h1 className="text-xl font-bold mb-4">{book.title}</h1>
+          <h2 className="text-lg mb-6">{book.author.name}</h2>
+          
+          {getContentForPage(currentPage).map((paragraph, index) => (
+            <p key={index} className="mb-4 text-balance">
+              {paragraph}
+            </p>
+          ))}
+        </div>
       </div>
       
       <div 
