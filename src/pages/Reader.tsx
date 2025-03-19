@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Book, ReaderSettings } from '@/lib/types';
@@ -57,7 +56,7 @@ const mockBooks: Book[] = [
     rating: 4.7,
     reviewCount: 983,
     publishedDate: '1866-01-01',
-    content: 'Содержание "Преступления и наказания"...'
+    content: 'Содержание "Прест��пления и наказания"...'
   },
 ];
 
@@ -85,10 +84,8 @@ const Reader: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Сначала ищем в моковых данных
     let fetchedBook = mockBooks.find((b) => b.id === id);
     
-    // Если не нашли, ищем в загруженных авторами книгах
     if (!fetchedBook) {
       const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
       fetchedBook = authorBooks.find((b: Book) => b.id === id);
@@ -98,9 +95,8 @@ const Reader: React.FC = () => {
       setBook(fetchedBook || null);
       setLoading(false);
       if (fetchedBook && fetchedBook.content) {
-        // Расчет количества страниц на основе размера контента
         const contentLength = fetchedBook.content.length;
-        const charsPerPage = 2000; // Примерное количество символов на странице
+        const charsPerPage = 2000;
         setTotalPages(Math.max(1, Math.ceil(contentLength / charsPerPage)));
       }
     }, 500);
@@ -110,10 +106,7 @@ const Reader: React.FC = () => {
       setSettings(JSON.parse(savedSettings));
     }
     
-    // Предотвращение выделения текста на странице
     document.addEventListener('selectstart', preventTextSelection);
-    
-    // Создание аудио элемента для звука перелистывания
     pageFlipAudioRef.current = new Audio('/page-flip.mp3');
     
     return () => {
@@ -175,7 +168,6 @@ const Reader: React.FC = () => {
     setIsFlipping(true);
     setFlipDirection(direction);
     
-    // Воспроизведение звука перелистывания
     if (pageFlipAudioRef.current) {
       pageFlipAudioRef.current.currentTime = 0;
       pageFlipAudioRef.current.play().catch(err => console.error('Error playing page flip sound:', err));
@@ -187,7 +179,6 @@ const Reader: React.FC = () => {
       setCurrentPage(prev => prev - 1);
     }
     
-    // Сброс состояния анимации после завершения
     setTimeout(() => {
       setIsFlipping(false);
       setFlipDirection(null);
@@ -195,7 +186,7 @@ const Reader: React.FC = () => {
   };
   
   const getContentForPage = (pageNum: number) => {
-    if (!book || !book.content) return '';
+    if (!book || !book.content) return [];
     
     const charsPerPage = 2000;
     const startIdx = (pageNum - 1) * charsPerPage;
@@ -204,9 +195,8 @@ const Reader: React.FC = () => {
       endIdx = book.content.length;
     }
     
-    // Получение текста для текущей страницы
     const pageContent = book.content.substring(startIdx, endIdx);
-    return pageContent.split('\n\n');
+    return pageContent.split('\n\n').filter(paragraph => paragraph.trim() !== '');
   };
   
   if (loading) {
@@ -414,7 +404,7 @@ const Reader: React.FC = () => {
           fontFamily: settings.fontFamily === 'serif' ? 'serif' : 'Inter, sans-serif',
           maxWidth: '800px',
           margin: '0 auto',
-          userSelect: 'none', // Запрещаем выделение текста
+          userSelect: 'none',
           WebkitUserSelect: 'none',
           MozUserSelect: 'none',
           msUserSelect: 'none'
