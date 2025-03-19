@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Book, ReaderSettings } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -77,6 +77,12 @@ const Reader: React.FC = () => {
   const [settings, setSettings] = useState<ReaderSettings>(defaultSettings);
   const [showControls, setShowControls] = useState(true);
   const [controlTimeout, setControlTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [flipDirection, setFlipDirection] = useState<'left' | 'right' | null>(null);
+  const pageFlipAudioRef = useRef<HTMLAudioElement | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Сначала ищем в моковых данных
@@ -91,6 +97,12 @@ const Reader: React.FC = () => {
     setTimeout(() => {
       setBook(fetchedBook || null);
       setLoading(false);
+      if (fetchedBook && fetchedBook.content) {
+        // Расчет количества страниц на основе размера контента
+        const contentLength = fetchedBook.content.length;
+        const charsPerPage = 2000; // Примерное количество символов на странице
+        setTotalPages(Math.max(1, Math.ceil(contentLength / charsPerPage)));
+      }
     }, 500);
     
     const savedSettings = localStorage.getItem('orenkniga-reader-settings');
@@ -98,12 +110,24 @@ const Reader: React.FC = () => {
       setSettings(JSON.parse(savedSettings));
     }
     
+    // Предотвращение выделения текста на странице
+    document.addEventListener('selectstart', preventTextSelection);
+    
+    // Создание аудио элемента для звука перелистывания
+    pageFlipAudioRef.current = new Audio('/page-flip.mp3');
+    
     return () => {
       if (controlTimeout) {
         clearTimeout(controlTimeout);
       }
+      document.removeEventListener('selectstart', preventTextSelection);
     };
   }, [id]);
+  
+  const preventTextSelection = (e: Event) => {
+    e.preventDefault();
+    return false;
+  };
   
   useEffect(() => {
     localStorage.setItem('orenkniga-reader-settings', JSON.stringify(settings));
@@ -145,6 +169,46 @@ const Reader: React.FC = () => {
     toast.success('Закладка добавлена');
   };
   
+  const flipPage = (direction: 'left' | 'right') => {
+    if (isFlipping) return;
+    
+    setIsFlipping(true);
+    setFlipDirection(direction);
+    
+    // Воспроизведение звука перелистывания
+    if (pageFlipAudioRef.current) {
+      pageFlipAudioRef.current.currentTime = 0;
+      pageFlipAudioRef.current.play().catch(err => console.error('Error playing page flip sound:', err));
+    }
+    
+    if (direction === 'right' && currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    } else if (direction === 'left' && currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+    
+    // Сброс состояния анимации после завершения
+    setTimeout(() => {
+      setIsFlipping(false);
+      setFlipDirection(null);
+    }, 500);
+  };
+  
+  const getContentForPage = (pageNum: number) => {
+    if (!book || !book.content) return '';
+    
+    const charsPerPage = 2000;
+    const startIdx = (pageNum - 1) * charsPerPage;
+    let endIdx = startIdx + charsPerPage;
+    if (endIdx > book.content.length) {
+      endIdx = book.content.length;
+    }
+    
+    // Получение текста для текущей страницы
+    const pageContent = book.content.substring(startIdx, endIdx);
+    return pageContent.split('\n\n');
+  };
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -170,7 +234,7 @@ const Reader: React.FC = () => {
   return (
     <div 
       className={cn(
-        "min-h-screen w-full transition-colors duration-300",
+        "min-h-screen w-full transition-colors duration-300 select-none",
         settings.theme === 'dark' ? 'bg-background text-foreground' : 
         settings.theme === 'sepia' ? 'bg-amber-50 text-stone-800' : 
         'bg-background text-foreground'
@@ -337,20 +401,29 @@ const Reader: React.FC = () => {
       </div>
       
       <div 
-        className="py-16 transition-all duration-300 ease-in-out"
+        ref={contentRef}
+        className={cn(
+          "py-16 transition-all duration-300 ease-in-out select-none",
+          isFlipping && flipDirection === 'right' && "animate-page-flip-right",
+          isFlipping && flipDirection === 'left' && "animate-page-flip-left"
+        )}
         style={{
           padding: `64px ${settings.margins}px`,
           fontSize: `${settings.fontSize}px`,
           lineHeight: settings.lineHeight,
           fontFamily: settings.fontFamily === 'serif' ? 'serif' : 'Inter, sans-serif',
           maxWidth: '800px',
-          margin: '0 auto'
+          margin: '0 auto',
+          userSelect: 'none', // Запрещаем выделение текста
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
         }}
       >
         <h1 className="text-xl font-bold mb-4">{book.title}</h1>
         <h2 className="text-lg mb-6">{book.author.name}</h2>
         
-        {book.content?.split('\n\n').map((paragraph, index) => (
+        {getContentForPage(currentPage).map((paragraph, index) => (
           <p key={index} className="mb-4 text-balance">
             {paragraph}
           </p>
@@ -369,11 +442,23 @@ const Reader: React.FC = () => {
         </Button>
         
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full"
+            onClick={() => flipPage('left')}
+            disabled={currentPage <= 1 || isFlipping}
+          >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <span className="text-sm">Стр. 1 из 12</span>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <span className="text-sm">Стр. {currentPage} из {totalPages}</span>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full"
+            onClick={() => flipPage('right')}
+            disabled={currentPage >= totalPages || isFlipping}
+          >
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>

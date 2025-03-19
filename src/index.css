@@ -129,3 +129,56 @@
     text-wrap: balance;
   }
 }
+
+/* Page flip animations */
+@keyframes page-flip-right {
+  0% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0);
+    transform-origin: left;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(-20deg);
+    transform-origin: left;
+  }
+}
+
+@keyframes page-flip-left {
+  0% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0);
+    transform-origin: right;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(20deg);
+    transform-origin: right;
+  }
+}
+
+.animate-page-flip-right {
+  animation: page-flip-right 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+  animation-delay: 0ms;
+}
+
+.animate-page-flip-left {
+  animation: page-flip-left 0.5s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+  animation-delay: 0ms;
+}
+
+/* Reader specific styles */
+.reader-content {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.select-none * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
