@@ -8,16 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookText, 
   ChevronLeft, 
-  Edit,
   Trash2,
   Upload,
-  Star,
   Eye,
   Pencil,
   BarChart
 } from 'lucide-react';
 import { Book } from '@/lib/types';
-import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -28,39 +25,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Получаем книги из localStorage или используем моковые данные
+// Получаем книги из localStorage
 const getAuthorBooks = (userId: string): Book[] => {
   const storedBooks = localStorage.getItem('orenkniga-author-books');
-  const authorBooks = storedBooks ? JSON.parse(storedBooks) : [];
+  if (!storedBooks) return [];
   
-  // Фильтруем книги по ID автора, если хранилище не пусто
-  if (authorBooks.length > 0) {
-    return authorBooks.filter((book: Book) => book.author.id === userId);
-  }
-  
-  // Иначе возвращаем моковые данные
-  return [
-    {
-      id: '5',
-      title: 'Мой первый роман',
-      author: { id: userId, name: 'Автор' },
-      description: 'Дебютный роман о приключениях молодого человека в большом городе.',
-      genres: ['Приключения', 'Современная проза'],
-      rating: 4.2,
-      reviewCount: 32,
-      publishedDate: '2023-05-15'
-    },
-    {
-      id: '6',
-      title: 'Летние истории',
-      author: { id: userId, name: 'Автор' },
-      description: 'Сборник коротких рассказов о лете и отдыхе.',
-      genres: ['Рассказы', 'Лирика'],
-      rating: 4.5,
-      reviewCount: 18,
-      publishedDate: '2023-07-20'
-    }
-  ];
+  const authorBooks = JSON.parse(storedBooks);
+  // Фильтруем книги по ID автора
+  return authorBooks.filter((book: Book) => book.author.id === userId);
 };
 
 const Author: React.FC = () => {
@@ -155,30 +127,40 @@ const Author: React.FC = () => {
                     <div key={book.id} className="border rounded-lg overflow-hidden bg-card hover:shadow-sm transition-shadow">
                       <div className="p-4">
                         <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium">{book.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Опубликовано: {new Date(book.publishedDate).toLocaleDateString('ru-RU')}
-                            </p>
+                          <div className="flex gap-3">
+                            {book.cover && (
+                              <div className="w-16 h-24 rounded overflow-hidden flex-shrink-0 border">
+                                <img 
+                                  src={book.cover} 
+                                  alt={book.title} 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <h3 className="font-medium">{book.title}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Опубликовано: {new Date(book.publishedDate).toLocaleDateString('ru-RU')}
+                              </p>
+                              <p className="text-sm mt-2 line-clamp-2">{book.description}</p>
+                              
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {book.genres.map((genre, i) => (
+                                  <span 
+                                    key={i}
+                                    className="text-xs bg-secondary px-2 py-0.5 rounded-full"
+                                  >
+                                    {genre}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="text-amber-500 text-sm">★</span>
                             <span className="text-sm">{book.rating.toFixed(1)}</span>
                             <span className="text-sm text-muted-foreground">({book.reviewCount})</span>
                           </div>
-                        </div>
-                        
-                        <p className="text-sm mt-2 line-clamp-2">{book.description}</p>
-                        
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {book.genres.map((genre, i) => (
-                            <span 
-                              key={i}
-                              className="text-xs bg-secondary px-2 py-0.5 rounded-full"
-                            >
-                              {genre}
-                            </span>
-                          ))}
                         </div>
                       </div>
                       
@@ -230,25 +212,25 @@ const Author: React.FC = () => {
               <div className="space-y-4">
                 <div className="text-center py-8 bg-muted/10 rounded-lg">
                   <h3 className="font-medium">Статистика чтения</h3>
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    {books.map(book => (
-                      <div key={book.id} className="border rounded-md p-3 bg-card">
-                        <h4 className="font-medium text-sm truncate">{book.title}</h4>
-                        <div className="flex justify-between mt-2 text-sm">
-                          <span>Просмотры:</span>
-                          <span className="font-medium">{Math.floor(Math.random() * 100) + 10}</span>
+                  {books.length > 0 ? (
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      {books.map(book => (
+                        <div key={book.id} className="border rounded-md p-3 bg-card">
+                          <h4 className="font-medium text-sm truncate">{book.title}</h4>
+                          <div className="flex justify-between mt-2 text-sm">
+                            <span>Просмотры:</span>
+                            <span className="font-medium">{Math.floor(Math.random() * 100) + 10}</span>
+                          </div>
+                          <div className="flex justify-between mt-1 text-sm">
+                            <span>Рейтинг:</span>
+                            <span className="font-medium text-amber-500">
+                              {book.rating.toFixed(1)} <span className="text-xs">({book.reviewCount})</span>
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex justify-between mt-1 text-sm">
-                          <span>Рейтинг:</span>
-                          <span className="font-medium text-amber-500">
-                            {book.rating.toFixed(1)} <span className="text-xs">({book.reviewCount})</span>
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {books.length === 0 && (
+                      ))}
+                    </div>
+                  ) : (
                     <p className="text-sm text-muted-foreground mt-4">
                       Загрузите произведения, чтобы видеть их статистику
                     </p>

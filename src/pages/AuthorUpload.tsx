@@ -8,7 +8,8 @@ import {
   ChevronLeft, 
   Upload,
   FileText,
-  Info
+  Info,
+  Image as ImageIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
@@ -31,6 +32,8 @@ const AuthorUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileContent, setFileContent] = useState<string>('');
   const [previewMode, setPreviewMode] = useState(false);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   
   useEffect(() => {
     if (!user) {
@@ -69,6 +72,25 @@ const AuthorUpload: React.FC = () => {
       reader.readAsText(file);
     }
   };
+
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Пожалуйста, загрузите файл изображения');
+        return;
+      }
+      
+      setCoverImageFile(file);
+      
+      // Создаем превью изображения
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setCoverImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
   const handleBookUpload = () => {
     if (!selectedFile && !uploadForm.content) {
@@ -94,7 +116,8 @@ const AuthorUpload: React.FC = () => {
         rating: 0,
         reviewCount: 0,
         publishedDate: new Date().toISOString().split('T')[0],
-        content: uploadForm.content || fileContent
+        content: uploadForm.content || fileContent,
+        cover: coverImage
       };
       
       // В реальном приложении здесь был бы API-запрос
@@ -142,6 +165,71 @@ const AuthorUpload: React.FC = () => {
                     placeholder="Введите название произведения"
                     className="h-12"
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-base">Обложка</Label>
+                  <div className="border border-dashed rounded-lg p-6 text-center bg-muted/30">
+                    {coverImage ? (
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="relative w-32 h-48 rounded-md overflow-hidden border">
+                          <img 
+                            src={coverImage} 
+                            alt="Предпросмотр обложки" 
+                            className="w-full h-full object-cover"
+                          />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 h-6 w-6 p-0"
+                            onClick={() => {
+                              setCoverImage(null);
+                              setCoverImageFile(null);
+                            }}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            document.getElementById('cover-image')?.click();
+                          }}
+                        >
+                          Изменить
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center space-y-2">
+                        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">
+                            Загрузите обложку произведения
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Поддерживаемые форматы: JPG, PNG, GIF
+                          </p>
+                        </div>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            document.getElementById('cover-image')?.click();
+                          }}
+                        >
+                          Выбрать файл
+                        </Button>
+                      </div>
+                    )}
+                    <Input
+                      id="cover-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleCoverImageChange}
+                      className="hidden"
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
