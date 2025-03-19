@@ -63,9 +63,20 @@ const Index: React.FC = () => {
   const [newBooks, setNewBooks] = useState<Book[]>([]);
 
   useEffect(() => {
-    // In a real app, this would be API calls
-    setPopularBooks(mockBooks.sort((a, b) => b.rating - a.rating));
-    setNewBooks([...mockBooks].reverse());
+    // Combine mock books with author-uploaded books from localStorage
+    let allBooks = [...mockBooks];
+    
+    // Get author books from localStorage
+    const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
+    if (authorBooks.length > 0) {
+      allBooks = [...allBooks, ...authorBooks];
+    }
+    
+    // Set popular books (sorted by rating) and new books (sorted by date)
+    setPopularBooks([...allBooks].sort((a, b) => b.rating - a.rating));
+    setNewBooks([...allBooks].sort((a, b) => 
+      new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
+    ));
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {

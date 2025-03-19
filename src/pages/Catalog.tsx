@@ -88,7 +88,7 @@ const Catalog: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState('Все жанры');
   const [sortOption, setSortOption] = useState('rating');
   
-  // Parse query parameters
+  // Parse query parameters and load books
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get('q');
@@ -102,8 +102,17 @@ const Catalog: React.FC = () => {
       setSelectedGenre(category);
     }
     
-    // In a real app, this would be an API call with filters
-    let filteredBooks = [...mockBooks];
+    // Combine mock books with author-uploaded books from localStorage
+    let allBooks = [...mockBooks];
+    
+    // Get author books from localStorage
+    const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
+    if (authorBooks.length > 0) {
+      allBooks = [...allBooks, ...authorBooks];
+    }
+    
+    // Apply filters
+    let filteredBooks = [...allBooks];
     
     if (query) {
       const lowercaseQuery = query.toLowerCase();
