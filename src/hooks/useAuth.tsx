@@ -48,6 +48,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!storedUsers) {
       localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers));
     }
+    
+    // Clear all author books for final publication
+    localStorage.removeItem('orenkniga-author-books');
+    localStorage.removeItem('orenkniga-favorites');
+    
+    // Set empty arrays for books and favorites
+    localStorage.setItem('orenkniga-author-books', JSON.stringify([]));
+    localStorage.setItem('orenkniga-favorites', JSON.stringify([]));
 
     // Check if user is already logged in
     const currentUser = localStorage.getItem(CURRENT_USER_KEY);

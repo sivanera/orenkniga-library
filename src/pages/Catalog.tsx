@@ -11,8 +11,6 @@ import { ChevronLeft, Filter, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const mockBooks: Book[] = [];
-
 const genres = ['Все жанры', 'Классика', 'Фантастика', 'Детективы', 'Романы', 'История', 'Психология', 'Драма', 'Поэма'];
 
 const Catalog: React.FC = () => {
@@ -37,14 +35,8 @@ const Catalog: React.FC = () => {
       setSelectedGenre(category);
     }
     
-    let allBooks: Book[] = [];
-    
     const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
-    if (authorBooks.length > 0) {
-      allBooks = [...authorBooks];
-    }
-    
-    let filteredBooks = [...allBooks];
+    let filteredBooks = [...authorBooks];
     
     if (query) {
       const lowercaseQuery = query.toLowerCase();
@@ -198,13 +190,13 @@ const Catalog: React.FC = () => {
             </div>
             
             <TabsContent value="grid" className="pt-2">
-              <div className="grid grid-cols-2 gap-3">
-                {books.map((book) => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-              </div>
-              
-              {books.length === 0 && (
+              {books.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {books.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                </div>
+              ) : (
                 <div className="text-center py-12 text-muted-foreground">
                   <p>Книги не найдены</p>
                   <Button 
@@ -219,56 +211,56 @@ const Catalog: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="list" className="pt-2">
-              <div className="flex flex-col space-y-3">
-                {books.map((book) => (
-                  <div 
-                    key={book.id}
-                    className="border rounded-lg p-3 flex gap-3 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/book/${book.id}`)}
-                  >
-                    <div className="w-16 h-24 bg-muted rounded shrink-0 overflow-hidden">
-                      {book.cover ? (
-                        <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-primary/10">
-                          <span className="text-primary/50 text-xs">OrenKniga</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium">{book.title}</h3>
-                      <p className="text-sm text-muted-foreground">{book.author.name}</p>
-                      <div className="flex items-center space-x-1 mt-1">
-                        <span className="text-amber-500 text-xs">★</span>
-                        <span className="text-xs">{book.rating.toFixed(1)}</span>
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {book.genres.slice(0, 2).map((genre) => (
-                          <span 
-                            key={genre} 
-                            className="text-[10px] bg-secondary px-2 py-0.5 rounded-full"
-                          >
-                            {genre}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                {books.length === 0 && (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <p>Книги не найдены</p>
-                    <Button 
-                      variant="link" 
-                      onClick={clearFilters}
-                      className="mt-2"
+              {books.length > 0 ? (
+                <div className="flex flex-col space-y-3">
+                  {books.map((book) => (
+                    <div 
+                      key={book.id}
+                      className="border rounded-lg p-3 flex gap-3 cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => navigate(`/book/${book.id}`)}
                     >
-                      Сбросить фильтры
-                    </Button>
-                  </div>
-                )}
-              </div>
+                      <div className="w-16 h-24 bg-muted rounded shrink-0 overflow-hidden">
+                        {book.cover ? (
+                          <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-primary/10">
+                            <span className="text-primary/50 text-xs">OrenKniga</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium">{book.title}</h3>
+                        <p className="text-sm text-muted-foreground">{book.author.name}</p>
+                        <div className="flex items-center space-x-1 mt-1">
+                          <span className="text-amber-500 text-xs">★</span>
+                          <span className="text-xs">{book.rating.toFixed(1)}</span>
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {book.genres.slice(0, 2).map((genre) => (
+                            <span 
+                              key={genre} 
+                              className="text-[10px] bg-secondary px-2 py-0.5 rounded-full"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Книги не найдены</p>
+                  <Button 
+                    variant="link" 
+                    onClick={clearFilters}
+                    className="mt-2"
+                  >
+                    Сбросить фильтры
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

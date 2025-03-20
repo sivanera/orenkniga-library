@@ -1,32 +1,17 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronRight, Search, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BookCard from '@/components/BookCard';
-import { Book } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [popularBooks, setPopularBooks] = useState<Book[]>([]);
-  const [newBooks, setNewBooks] = useState<Book[]>([]);
-
-  useEffect(() => {
-    // Получаем только книги авторов из localStorage
-    const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
-    
-    // Устанавливаем популярные и новые книги
-    setPopularBooks([...authorBooks].sort((a, b) => b.rating - a.rating));
-    setNewBooks([...authorBooks].sort((a, b) => 
-      new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
-    ));
-  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,48 +77,32 @@ const Index: React.FC = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="popular" className="pt-4">
-              {popularBooks.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {popularBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 bg-muted/10 rounded-lg">
-                  <p className="text-muted-foreground">Пока нет книг в библиотеке</p>
-                  {user?.role === 'author' && (
-                    <Button 
-                      variant="link" 
-                      onClick={() => navigate('/author/upload')}
-                      className="mt-2"
-                    >
-                      Загрузить свое произведение
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="text-center py-8 bg-muted/10 rounded-lg">
+                <p className="text-muted-foreground">Пока нет книг в библиотеке</p>
+                {user?.role === 'author' && (
+                  <Button 
+                    variant="link" 
+                    onClick={() => navigate('/author/upload')}
+                    className="mt-2"
+                  >
+                    Загрузить свое произведение
+                  </Button>
+                )}
+              </div>
             </TabsContent>
             <TabsContent value="new" className="pt-4">
-              {newBooks.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {newBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 bg-muted/10 rounded-lg">
-                  <p className="text-muted-foreground">Пока нет новых книг</p>
-                  {user?.role === 'author' && (
-                    <Button 
-                      variant="link" 
-                      onClick={() => navigate('/author/upload')}
-                      className="mt-2"
-                    >
-                      Загрузить свое произведение
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="text-center py-8 bg-muted/10 rounded-lg">
+                <p className="text-muted-foreground">Пока нет новых книг</p>
+                {user?.role === 'author' && (
+                  <Button 
+                    variant="link" 
+                    onClick={() => navigate('/author/upload')}
+                    className="mt-2"
+                  >
+                    Загрузить свое произведение
+                  </Button>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>

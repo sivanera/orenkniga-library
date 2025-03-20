@@ -11,13 +11,12 @@ import {
   Edit, 
   LogOut, 
   Settings, 
-  User, 
-  Upload,
   Heart,
   History,
   Globe,
   Moon,
   PenTool,
+  Upload,
   ChevronRight
 } from 'lucide-react';
 import BookCard from '@/components/BookCard';
@@ -26,9 +25,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-
-const mockBooks: Book[] = [];
 
 const Profile: React.FC = () => {
   const { user, logout, updateProfile } = useAuth();
@@ -54,7 +50,7 @@ const Profile: React.FC = () => {
     
     const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
     const favorites = JSON.parse(localStorage.getItem('orenkniga-favorites') || '[]');
-    const favoriteBooksList = authorBooks.filter(book => favorites.includes(book.id));
+    const favoriteBooksList = authorBooks.filter((book: Book) => favorites.includes(book.id));
     setFavoriteBooks(favoriteBooksList);
     
     setHistoryBooks([]);
@@ -220,60 +216,17 @@ const Profile: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="history">
-            {historyBooks.length > 0 ? (
-              <div className="space-y-4">
-                {historyBooks.map((book) => (
-                  <div 
-                    key={book.id}
-                    className="flex gap-3 p-3 border rounded-lg cursor-pointer hover:shadow-sm transition-shadow"
-                    onClick={() => navigate(`/reader/${book.id}`)}
-                  >
-                    <div className="w-12 h-16 bg-muted rounded overflow-hidden shrink-0">
-                      {book.cover ? (
-                        <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-primary/10">
-                          <span className="text-primary/50 text-xs">OrenKniga</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm">{book.title}</h3>
-                      <p className="text-xs text-muted-foreground">{book.author.name}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <BookMarked className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Прочитано: 30%</span>
-                      </div>
-                    </div>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="self-center shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/reader/${book.id}`);
-                      }}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <History className="h-10 w-10 mx-auto mb-2 text-muted" />
-                <p>История чтения пуста</p>
-                <Button 
-                  variant="link" 
-                  onClick={() => navigate('/catalog')}
-                  className="mt-2"
-                >
-                  Начать читать
-                </Button>
-              </div>
-            )}
+            <div className="text-center py-8 text-muted-foreground">
+              <History className="h-10 w-10 mx-auto mb-2 text-muted" />
+              <p>История чтения пуста</p>
+              <Button 
+                variant="link" 
+                onClick={() => navigate('/catalog')}
+                className="mt-2"
+              >
+                Начать читать
+              </Button>
+            </div>
           </TabsContent>
           
           <TabsContent value="settings">
