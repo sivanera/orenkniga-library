@@ -156,7 +156,7 @@ export default {
 				'page-flip-left': 'page-flip-left 0.8s cubic-bezier(0.3, 0.1, 0.3, 1.0) forwards'
 			},
 			fontFamily: {
-				sans: ['Inter', 'system-ui', 'sans-serif'],
+				sans: ['Merriweather', 'Inter', 'system-ui', 'sans-serif'],
 				serif: ['Merriweather', 'Georgia', 'serif'],
 			}
 		}
