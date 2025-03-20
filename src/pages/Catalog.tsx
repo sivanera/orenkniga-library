@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,70 +11,7 @@ import { ChevronLeft, Filter, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Mock data
-const mockBooks: Book[] = [
-  {
-    id: '1',
-    title: 'Мастер и Маргарита',
-    author: { id: '3', name: 'Михаил Булгаков' },
-    description: 'Классический роман о добре и зле, о жизни и смерти, о любви и ненависти.',
-    genres: ['Классика', 'Фантастика', 'Роман'],
-    rating: 4.8,
-    reviewCount: 1240,
-    publishedDate: '1967-01-01'
-  },
-  {
-    id: '2',
-    title: 'Преступление и наказание',
-    author: { id: '4', name: 'Федор Достоевский' },
-    description: 'Психологический роман о нравственных мучениях и преступлении.',
-    genres: ['Классика', 'Психология', 'Роман'],
-    rating: 4.7,
-    reviewCount: 983,
-    publishedDate: '1866-01-01'
-  },
-  {
-    id: '3',
-    title: 'Тихий Дон',
-    author: { id: '5', name: 'Михаил Шолохов' },
-    description: 'Эпопея о донском казачестве в Первой мировой и Гражданской войнах.',
-    genres: ['Классика', 'История', 'Роман'],
-    rating: 4.6,
-    reviewCount: 754,
-    publishedDate: '1928-01-01'
-  },
-  {
-    id: '4',
-    title: 'Война и мир',
-    author: { id: '6', name: 'Лев Толстой' },
-    description: 'Эпический роман о русском обществе в эпоху войн против Наполеона.',
-    cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=687&auto=format&fit=crop',
-    genres: ['Классика', 'История', 'Роман'],
-    rating: 4.9,
-    reviewCount: 1427,
-    publishedDate: '1869-01-01'
-  },
-  {
-    id: '5',
-    title: 'Евгений Онегин',
-    author: { id: '7', name: 'Александр Пушкин' },
-    description: 'Роман в стихах о молодом дворянине из Санкт-Петербурга.',
-    genres: ['Классика', 'Поэма', 'Роман в стихах'],
-    rating: 4.7,
-    reviewCount: 856,
-    publishedDate: '1833-01-01'
-  },
-  {
-    id: '6',
-    title: 'Анна Каренина',
-    author: { id: '6', name: 'Лев Толстой' },
-    description: 'Роман о трагической судьбе замужней женщины, полюбившей другого человека.',
-    genres: ['Классика', 'Роман', 'Драма'],
-    rating: 4.8,
-    reviewCount: 1122,
-    publishedDate: '1877-01-01'
-  }
-];
+const mockBooks: Book[] = [];
 
 const genres = ['Все жанры', 'Классика', 'Фантастика', 'Детективы', 'Романы', 'История', 'Психология', 'Драма', 'Поэма'];
 
@@ -88,7 +24,6 @@ const Catalog: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState('Все жанры');
   const [sortOption, setSortOption] = useState('rating');
   
-  // Parse query parameters and load books
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get('q');
@@ -102,16 +37,13 @@ const Catalog: React.FC = () => {
       setSelectedGenre(category);
     }
     
-    // Combine mock books with author-uploaded books from localStorage
-    let allBooks = [...mockBooks];
+    let allBooks: Book[] = [];
     
-    // Get author books from localStorage
     const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
     if (authorBooks.length > 0) {
-      allBooks = [...allBooks, ...authorBooks];
+      allBooks = [...authorBooks];
     }
     
-    // Apply filters
     let filteredBooks = [...allBooks];
     
     if (query) {
@@ -128,7 +60,6 @@ const Catalog: React.FC = () => {
       );
     }
     
-    // Apply sorting
     if (sortOption === 'rating') {
       filteredBooks.sort((a, b) => b.rating - a.rating);
     } else if (sortOption === 'newest') {
@@ -213,7 +144,6 @@ const Catalog: React.FC = () => {
           </Select>
         </div>
         
-        {/* Filter Panel */}
         <div className={cn(
           "bg-card border rounded-lg shadow-lg p-4 space-y-4 transition-all duration-300",
           filterOpen ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 overflow-hidden p-0 border-0"
@@ -255,7 +185,6 @@ const Catalog: React.FC = () => {
           </div>
         </div>
         
-        {/* Results */}
         <div className="pt-2">
           <Tabs defaultValue="grid" className="w-full">
             <div className="flex items-center justify-between mb-4">

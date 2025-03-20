@@ -28,49 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-const mockBooks: Book[] = [
-  {
-    id: '1',
-    title: 'Мастер и Маргарита',
-    author: { id: '3', name: 'Михаил Булгаков' },
-    description: 'Классический роман о добре и зле, о жизни и смерти, о любви и ненависти.',
-    genres: ['Классика', 'Фантастика', 'Роман'],
-    rating: 4.8,
-    reviewCount: 1240,
-    publishedDate: '1967-01-01'
-  },
-  {
-    id: '2',
-    title: 'Преступление и наказание',
-    author: { id: '4', name: 'Федор Достоевский' },
-    description: 'Психологический роман о нравственных мучениях и преступлении.',
-    genres: ['Классика', 'Психология', 'Роман'],
-    rating: 4.7,
-    reviewCount: 983,
-    publishedDate: '1866-01-01'
-  },
-  {
-    id: '3',
-    title: 'Тихий Дон',
-    author: { id: '5', name: 'Михаил Шолохов' },
-    description: 'Эпопея о донском казачестве в Первой мировой и Гражданской войнах.',
-    genres: ['Классика', 'История', 'Роман'],
-    rating: 4.6,
-    reviewCount: 754,
-    publishedDate: '1928-01-01'
-  },
-  {
-    id: '4',
-    title: 'Война и мир',
-    author: { id: '6', name: 'Лев Толстой' },
-    cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=687&auto=format&fit=crop',
-    description: 'Эпический роман о русском обществе в эпоху войн против Наполеона.',
-    genres: ['Классика', 'История', 'Роман'],
-    rating: 4.9,
-    reviewCount: 1427,
-    publishedDate: '1869-01-01'
-  },
-];
+const mockBooks: Book[] = [];
 
 const Profile: React.FC = () => {
   const { user, logout, updateProfile } = useAuth();
@@ -94,11 +52,12 @@ const Profile: React.FC = () => {
       bio: user.bio || ''
     });
     
+    const authorBooks = JSON.parse(localStorage.getItem('orenkniga-author-books') || '[]');
     const favorites = JSON.parse(localStorage.getItem('orenkniga-favorites') || '[]');
-    const favoriteBooksList = mockBooks.filter(book => favorites.includes(book.id));
+    const favoriteBooksList = authorBooks.filter(book => favorites.includes(book.id));
     setFavoriteBooks(favoriteBooksList);
     
-    setHistoryBooks(mockBooks.slice(0, 3));
+    setHistoryBooks([]);
   }, [user, navigate]);
   
   const handleLogout = () => {
